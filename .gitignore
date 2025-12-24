@@ -1,0 +1,16 @@
+# Logs directory
+logs/
+
+# Windows temporary files
+*.tmp
+*.temp
+Thumbs.db
+
+# CLISP files
+*.fas
+*.lib
+*.mem
+
+# Output files (except logs)
+*.txt
+*.log

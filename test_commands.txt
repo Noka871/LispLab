@@ -1,0 +1,6 @@
+;; Test commands for remove-deep function:
+(remove-deep 'a '(a b c))
+(remove-deep 'a '(a (a b) c))
+(remove-deep 'a '(1 2 3))
+(remove-deep 'a '(a (b (a c) a) d))
+(remove-deep 'a '())
