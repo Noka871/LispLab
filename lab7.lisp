@@ -1,5 +1,5 @@
 ;;; Laboratory work #1, Variant 7
-;;; Real tasks: summa_digits and f
+;;; Functions: summa_digits and f
 
 ;;; FUNCTION 1: summa_digits
 (defun summa_digits (n)
@@ -8,22 +8,26 @@
     (t (+ (mod n 10) 
           (summa_digits (truncate n 10))))))
 
-;;; FUNCTION 2: f (main version)
+;;; FUNCTION 2: f (main version) - только перестановка
 (defun f (s)
   (append
-    (mapcar #'- (remove-if-not #'minusp s))
-    (mapcar #'- (remove-if #'minusp s))))
+    (remove-if-not #'minusp s)   ; Отрицательные (без изменения знака)
+    (remove-if #'minusp s)))     ; Положительные (без изменения знака)
 
-;;; FUNCTION 2: f (recursive version)
+;;; FUNCTION 2: f (recursive version) - только перестановка
 (defun f-recursive (s)
-  (cond
-    ((null s) nil)
-    ((< (first s) 0)
-     (cons (- (first s)) 
-           (f-recursive (rest s))))
-    (t 
-     (let ((rest-result (f-recursive (rest s))))
-       (append rest-result (list (- (first s))))))))
+  (labels ((helper (lst neg pos)
+             (cond
+               ((null lst) (append (reverse neg) (reverse pos)))
+               ((< (first lst) 0)
+                (helper (rest lst) 
+                        (cons (first lst) neg) 
+                        pos))
+               (t
+                (helper (rest lst)
+                        neg
+                        (cons (first lst) pos))))))
+    (helper s nil nil)))
 
 ;;; TEST FUNCTION
 (defun test-all ()
@@ -35,7 +39,7 @@
   (format t "  (summa_digits 123) -> ~a~%" (summa_digits 123))
   (format t "  (summa_digits 1001) -> ~a~%~%" (summa_digits 1001))
   
-  (format t "Function 2: f~%")
+  (format t "Function 2: f (перестановка отрицательных в начало)~%")
   (format t "  (f '(4 -8 6 -9 -7)) -> ~a~%" (f '(4 -8 6 -9 -7)))
   (format t "  (f '()) -> ~a~%" (f '()))
   (format t "  (f '(1 2 3)) -> ~a~%" (f '(1 2 3)))
@@ -48,5 +52,5 @@
   (format t "~%=== ALL TESTS COMPLETED ===~%")
   t)
 
-;;; Uncomment to auto-run tests:
-;; (test-all)
+;;; Auto-run tests
+(test-all)
