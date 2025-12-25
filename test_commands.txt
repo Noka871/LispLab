@@ -1,6 +1,27 @@
-;; Test commands for remove-deep function:
-(remove-deep 'a '(a b c))
-(remove-deep 'a '(a (a b) c))
-(remove-deep 'a '(1 2 3))
-(remove-deep 'a '(a (b (a c) a) d))
-(remove-deep 'a '())
+=== Manual Testing Commands for Lab 7 (Variant 7) ===
+
+1. Load the file:
+   (load "lab7.lisp")
+
+2. Test SUMMA_DIGITS:
+   (summa_digits 0)
+   (summa_digits 123)
+   (summa_digits 1001)
+
+3. Test F function:
+   (f '(4 -8 6 -9 -7))
+   (f '(1 2 3))
+   (f '(-1 -2 -3))
+   (f '(0 -5 10 -15))
+
+4. Test F-CHANGE-SIGN:
+   (f-change-sign '(1 -2 3))
+   (f-change-sign '(1 (2 -3) 4))
+   (f-change-sign '(-10 20 -30))
+
+5. Test F-RECURSIVE:
+   (f-recursive '(4 -8 6 -9 -7))
+   (f-recursive '(-1 0 1))
+
+6. Load version with tests:
+   (load "lab7_with_tests.lisp")

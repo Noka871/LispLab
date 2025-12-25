@@ -1,57 +1,133 @@
-;;; Laboratory work #1, Variant 7
-;;; Function: remove-deep with built-in testing
+;;; ============================================================
+;;; Лабораторная работа №7 - Расширенная версия с тестами
+;;; Включает трассировку функций для отладки
+;;; ============================================================
 
-(defun remove-deep (x s)
-  "Remove element X from list S at all nesting levels"
-  (cond
-    ((null s) nil)
-    ((listp (first s))
-     (cons (remove-deep x (first s))
-           (remove-deep x (rest s))))
-    ((equal (first s) x)
-     (remove-deep x (rest s)))
-    (t
-     (cons (first s) (remove-deep x (rest s))))))
+(load "lab7.lisp")  ; Загружаем основные функции
 
-;;; Test suite
-(defun run-tests (&optional (verbose t))
-  "Run all tests and return T if all pass"
-  (let ((results nil)
-        (test-count 0)
-        (pass-count 0))
-    
-    (dolist (test '(((a b c) (b c))
-                    ((a (a b) c) ((b) c))
-                    ((1 2 3) (1 2 3))
-                    ((a (b (a c) a) d) ((b (c)) d))))
-      (incf test-count)
-      (let* ((input (first test))
-             (expected (second test))
-             (result (remove-deep 'a input))
-             (passed (equal result expected)))
-        
-        (when verbose
-          (format t "Test ~d: ~a~%" test-count input)
-          (format t "  Expected: ~a~%" expected)
-          (format t "  Got:      ~a~%" result)
-          (format t "  Status:   ~a~%~%" 
-                  (if passed "PASS" "FAIL")))
-        
-        (when passed (incf pass-count))
-        (push (list test-count passed result expected) results)))
-    
-    (when verbose
-      (format t "=== SUMMARY ===~%")
-      (format t "Tests run: ~d~%" test-count)
-      (format t "Passed:    ~d~%" pass-count)
-      (format t "Failed:    ~d~%" (- test-count pass-count))
-      (format t "Success:   ~d%%~%" 
-              (if (> test-count 0) 
-                  (floor (* 100 pass-count) test-count) 
-                  0)))
-    
-    (= pass-count test-count)))
+;;; ------------------------------------------------------------
+;;; ФУНКЦИИ ТРАССИРОВКИ ДЛЯ ДЕМОНСТРАЦИИ РАБОТЫ
+;;; ------------------------------------------------------------
 
-;;; Uncomment to auto-run tests when file loads
-;; (format t "~%=== Auto-running tests ===~%")
-;; (run-tests)
+(defun trace-all-functions ()
+  "Включает трассировку всех функций для наглядной демонстрации работы."
+  (format t "~%=== ВКЛЮЧЕНИЕ ТРАССИРОВКИ ФУНКЦИЙ ===~%~%")
+  
+  (trace summa_digits)
+  (format t "Трассировка summa_digits включена~%")
+  
+  (trace f)
+  (format t "Трассировка f включена~%")
+  
+  (trace f-change-sign)
+  (format t "Трассировка f-change-sign включена~%")
+  
+  (format t "~%Теперь при вызове функций будет показан процесс их работы.~%~%")
+  t)
+
+(defun untrace-all-functions ()
+  "Выключает трассировку всех функций."
+  (untrace summa_digits f f-change-sign f-recursive f-mapcar)
+  (format t "~%Трассировка всех функций выключена.~%")
+  t)
+
+;;; ------------------------------------------------------------
+;;; ДЕМОНСТРАЦИОННЫЕ ПРИМЕРЫ С ПОЯСНЕНИЯМИ
+;;; ------------------------------------------------------------
+
+(defun demonstrate-summa-digits ()
+  "Демонстрация работы summa_digits с пояснениями."
+  (format t "~%=== ДЕМОНСТРАЦИЯ SUMMA_DIGITS ===~%~%")
+  
+  (format t "Пример 1: (summa_digits 123)~%")
+  (format t "  123 -> последняя цифра: 3, оставшаяся часть: 12~%")
+  (format t "  Рекурсивно: summa_digits(12) = 1+2 = 3~%")
+  (format t "  Итог: 3 + 3 = 6~%")
+  (format t "  Результат: ~a~%~%" (summa_digits 123))
+  
+  (format t "Пример 2: (summa_digits 1001)~%")
+  (format t "  1001 -> последняя цифра: 1, оставшаяся часть: 100~%")
+  (format t "  Рекурсивно: summa_digits(100) = 1+0+0 = 1~%")
+  (format t "  Итог: 1 + 1 = 2~%")
+  (format t "  Результат: ~a~%~%" (summa_digits 1001))
+  t)
+
+(defun demonstrate-f-function ()
+  "Демонстрация работы функции f с пояснениями."
+  (format t "~%=== ДЕМОНСТРАЦИЯ ФУНКЦИИ F ===~%~%")
+  
+  (let ((example '(4 -8 6 -9 -7)))
+    (format t "Исходный список: ~a~%" example)
+    (format t "Шаг 1: (remove-if-not #'minusp ~a)~%" example)
+    (format t "       -> ~a~%" (remove-if-not #'minusp example))
+    (format t "Шаг 2: (remove-if #'minusp ~a)~%" example)
+    (format t "       -> ~a~%" (remove-if #'minusp example))
+    (format t "Шаг 3: (append шаг1 шаг2)~%")
+    (format t "       -> ~a~%~%" (f example)))
+  t)
+
+;;; ------------------------------------------------------------
+;;; РАСШИРЕННОЕ ТЕСТИРОВАНИЕ С ГЕНЕРАЦИЕЙ ТЕСТОВЫХ ДАННЫХ
+;;; ------------------------------------------------------------
+
+(defun generate-test-cases ()
+  "Генерация различных тестовых случаев."
+  (format t "~%=== ГЕНЕРАЦИЯ ТЕСТОВЫХ СЛУЧАЕВ ===~%~%")
+  
+  (format t "1. Случайные числа для summa_digits:~%")
+  (dolist (n '(0 5 10 99 123 456 1000 9999))
+    (format t "   summa_digits(~4d) = ~2d~%" n (summa_digits n)))
+  
+  (format t "~%2. Разные списки для функции f:~%")
+  (dolist (lst '(() (1) (-1) (1 2 3) (-1 -2 -3) (0 1 -1 2 -2)))
+    (format t "   f(~15a) = ~a~%" lst (f lst)))
+  
+  (format t "~%3. Вложенные списки для f-change-sign:~%")
+  (dolist (lst '((1) (1 -2) (1 (2)) (1 (2 -3) 4)))
+    (format t "   f-change-sign(~15a) = ~a~%" lst (f-change-sign lst)))
+  
+  t)
+
+;;; ------------------------------------------------------------
+;;; ГЛАВНАЯ ФУНКЦИЯ ДЛЯ ПОЛНОЙ ДЕМОНСТРАЦИИ
+;;; ------------------------------------------------------------
+
+(defun full-demonstration ()
+  "Полная демонстрация всех возможностей."
+  (format t "~%====================================================")
+  (format t "~%    ПОЛНАЯ ДЕМОНСТРАЦИЯ ЛАБОРАТОРНОЙ РАБОТЫ №7")
+  (format t "~%===================================================~%")
+  
+  ;; Демонстрация с трассировкой
+  (trace-all-functions)
+  
+  ;; Показываем работу функций с трассировкой
+  (format t "~%1. Вызов summa_digits с трассировкой:~%")
+  (summa_digits 123)
+  
+  (format t "~%2. Вызов f с трассировкой:~%")
+  (f '(4 -8 6 -9 -7))
+  
+  (format t "~%3. Вызов f-change-sign с трассировкой:~%")
+  (f-change-sign '(1 -2 3))
+  
+  ;; Выключаем трассировку
+  (untrace-all-functions)
+  
+  ;; Подробные демонстрации
+  (demonstrate-summa-digits)
+  (demonstrate-f-function)
+  (generate-test-cases)
+  
+  ;; Запуск всех тестов
+  (format t "~%=== ЗАПУСК ВСЕХ ТЕСТОВ ===~%")
+  (test-all)
+  
+  (format t "~%====================================================")
+  (format t "~%    ДЕМОНСТРАЦИЯ ЗАВЕРШЕНА УСПЕШНО!")
+  (format t "~%===================================================~%")
+  
+  t)
+
+;;; Автоматический запуск полной демонстрации
+(full-demonstration)
